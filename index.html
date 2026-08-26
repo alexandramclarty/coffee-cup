@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Cometeer Cup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shrikhand&family=Familjen+Grotesk:ital,wght@0,400..700;1,400..700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cocoa:#2B1B12;
+  --butter:#F3DFAF;
+  --milk:#FFF9EC;
+  --cherry:#B0202C;
+  --avocado:#6E7B3C;
+  --tangerine:#E39026;
+  --ink-soft:rgba(43,27,18,.58);
+  --hairline:rgba(43,27,18,.22);
+  --display:"Shrikhand",Georgia,serif;
+  --body:"Familjen Grotesk","Helvetica Neue",Arial,sans-serif;
+  --data:"DM Mono",ui-monospace,Menlo,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:var(--butter);
+  color:var(--cocoa);
+  font-family:var(--body);
+  font-size:17px;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+/* diner tablecloth */
+.cloth{
+  height:26px;
+  background-image:repeating-conic-gradient(var(--cherry) 0 25%, #d9455020 0 50%);
+  background-size:26px 26px;
+}
+.wrap{max-width:840px;margin:0 auto;padding:34px 20px 72px}
+
+/* ---------- header ---------- */
+header{text-align:center;margin-bottom:38px}
+.eyebrow{
+  font-family:var(--data);font-size:.72rem;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--ink-soft);margin:0 0 10px;
+}
+h1{
+  font-family:var(--display);font-weight:400;
+  font-size:clamp(2.7rem,9vw,4.4rem);line-height:.95;margin:0;
+  color:var(--cherry);
+  text-shadow:3px 3px 0 var(--butter),5px 5px 0 var(--cocoa);
+}
+.tagline{margin:18px auto 0;max-width:34ch;color:var(--ink-soft);font-size:.98rem}
+
+/* ---------- matchup card ---------- */
+.card{
+  background:var(--milk);
+  border:3px solid var(--cocoa);
+  border-radius:22px;
+  box-shadow:7px 7px 0 var(--cocoa);
+  padding:26px 22px 30px;
+}
+.card-head{
+  display:flex;align-items:center;justify-content:center;gap:14px;
+  font-family:var(--data);font-size:.74rem;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--ink-soft);margin-bottom:4px;flex-wrap:wrap;
+}
+.card-head .rule{flex:1;height:2px;background:var(--hairline);min-width:18px}
+.card-title{
+  font-family:var(--display);font-weight:400;text-align:center;
+  font-size:clamp(1.3rem,4.4vw,1.75rem);margin:6px 0 4px;
+}
+.house-note{
+  text-align:center;font-family:var(--data);font-size:.7rem;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--avocado);margin:0 0 6px;
+}
+
+.ring-row{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  margin-top:18px;flex-wrap:nowrap;
+}
+.side{flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;text-align:center}
+.lid{
+  width:100%;max-width:132px;aspect-ratio:1/1.1;
+  object-fit:contain;display:block;
+  transition:transform .3s cubic-bezier(.34,1.6,.5,1);
+}
+.side:hover .lid,.side:focus-within .lid{transform:rotate(-3deg) scale(1.05)}
+.brand{
+  font-family:var(--data);font-size:.68rem;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--ink-soft);margin:12px 0 2px;
+}
+.roast{font-family:var(--display);font-weight:400;font-size:1.12rem;line-height:1.2;margin:0 0 14px}
+
+/* coffee ring "vs" */
+.vs{
+  flex:0 0 auto;width:74px;height:74px;position:relative;display:grid;place-items:center;
+  transform:rotate(-7deg);
+}
+.vs::before,.vs::after{
+  content:"";position:absolute;border-radius:50%;
+  border:5px solid rgba(43,27,18,.22);
+}
+.vs::before{inset:0}
+.vs::after{inset:9px;border-width:3px;border-color:rgba(43,27,18,.14)}
+.vs span{
+  font-family:var(--display);font-size:1.15rem;color:var(--cocoa);opacity:.75;
+}
+
+.pick{
+  font-family:var(--body);font-weight:700;font-size:.92rem;
+  padding:11px 16px;width:100%;max-width:158px;cursor:pointer;
+  background:var(--tangerine);color:var(--cocoa);
+  border:2.5px solid var(--cocoa);border-radius:999px;
+  box-shadow:3px 3px 0 var(--cocoa);
+  transition:transform .12s,box-shadow .12s,background .12s;
+}
+.pick:hover{background:var(--cherry);color:var(--milk);transform:translate(1px,1px);box-shadow:2px 2px 0 var(--cocoa)}
+.pick:active{transform:translate(3px,3px);box-shadow:0 0 0 var(--cocoa)}
+:focus-visible{outline:3px solid var(--avocado);outline-offset:3px}
+
+/* ---------- punch card ---------- */
+.punchcard{
+  margin-top:34px;background:var(--milk);
+  border:3px dashed var(--cocoa);border-radius:18px;padding:20px 18px 22px;
+}
+.punch-head{
+  display:flex;justify-content:space-between;align-items:baseline;gap:12px;
+  font-family:var(--data);font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--ink-soft);margin-bottom:16px;flex-wrap:wrap;
+}
+.holes{
+  display:grid;grid-template-columns:repeat(21,1fr);gap:6px;
+}
+.hole{
+  aspect-ratio:1;border-radius:50%;display:grid;place-items:center;
+  font-family:var(--data);font-size:.62rem;
+  border:2px solid var(--hairline);color:var(--ink-soft);
+  background:transparent;
+}
+.hole.done{
+  background:var(--cocoa);border-color:var(--cocoa);color:var(--butter);
+  box-shadow:inset 0 2px 4px rgba(0,0,0,.5);
+}
+.hole.now{
+  border:2.5px solid var(--tangerine);color:var(--cocoa);font-weight:500;
+  background:#E3902620;
+}
+.hole.fresh{animation:thunk .4s cubic-bezier(.34,1.7,.5,1)}
+@keyframes thunk{0%{transform:scale(1.9);opacity:.2}60%{transform:scale(.88)}100%{transform:scale(1)}}
+
+/* ---------- standings ---------- */
+.standings{margin-top:34px}
+.sec-title{
+  font-family:var(--display);font-weight:400;font-size:1.5rem;margin:0 0 14px;text-align:center;
+}
+table{width:100%;border-collapse:collapse;font-family:var(--data);font-size:.88rem}
+th{
+  text-align:left;font-weight:500;font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--ink-soft);padding:0 8px 8px;border-bottom:2px solid var(--hairline);
+}
+td{padding:11px 8px;border-bottom:1px solid var(--hairline);vertical-align:middle}
+th.num,td.num{text-align:right;width:1%;white-space:nowrap}
+tr.top td{background:#E3902626}
+.rank{color:var(--ink-soft);width:1%;padding-right:0}
+.name-cell{display:flex;align-items:center;gap:10px;font-family:var(--body)}
+.chip{width:26px;height:29px;object-fit:contain;flex:0 0 auto}
+.name-cell b{font-weight:700}
+.name-cell small{display:block;color:var(--ink-soft);font-size:.78rem;font-family:var(--data)}
+.bar{
+  display:inline-block;height:9px;border-radius:5px;background:var(--avocado);
+  vertical-align:middle;min-width:3px;
+}
+
+/* ---------- podium / finale ---------- */
+.finale{text-align:center;padding:8px 0 4px}
+.ribbon{
+  display:inline-block;font-family:var(--data);font-size:.7rem;letter-spacing:.2em;
+  text-transform:uppercase;background:var(--cherry);color:var(--milk);
+  padding:6px 14px;border-radius:999px;margin-bottom:16px;
+}
+.podium{display:flex;justify-content:center;align-items:flex-end;gap:10px;flex-wrap:wrap;margin:14px 0 4px}
+.pod{display:flex;flex-direction:column;align-items:center;width:136px}
+.pod img{width:78px;height:86px;object-fit:contain}
+.pod .place{font-family:var(--display);font-size:1.6rem;color:var(--cherry);line-height:1}
+.pod .who{font-size:.88rem;margin-top:6px;line-height:1.3;font-weight:700}
+.pod .who small{display:block;color:var(--ink-soft);font-family:var(--data);font-size:.7rem;font-weight:400;margin-top:3px}
+.pod.first img{width:104px;height:114px}
+
+/* ---------- footer controls ---------- */
+.controls{
+  display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:30px;
+}
+.ghost{
+  font-family:var(--data);font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;
+  background:none;border:2px solid var(--hairline);color:var(--ink-soft);
+  padding:9px 15px;border-radius:999px;cursor:pointer;transition:.15s;
+}
+.ghost:hover{border-color:var(--cocoa);color:var(--cocoa)}
+.note{
+  text-align:center;font-family:var(--data);font-size:.7rem;color:var(--ink-soft);
+  margin-top:16px;line-height:1.6;
+}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+@media (max-width:560px){
+  .wrap{padding:24px 14px 56px}
+  .vs{width:52px;height:52px}
+  .vs span{font-size:.9rem}
+  .ring-row{gap:4px}
+  .holes{grid-template-columns:repeat(7,1fr);gap:7px}
+  .hole{font-size:.72rem}
+  .pod{width:108px}
+  .card{padding:22px 14px 26px;box-shadow:5px 5px 0 var(--cocoa)}
+  .roast{font-size:.98rem}
+  td,table{font-size:.8rem}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+}
+</style>
+</head>
+<body>
+<div class="cloth"></div>
+<div class="wrap">
+
+  <header>
+    <p class="eyebrow">Seven beans · twenty-one rounds · one winner</p>
+    <h1>The Cometeer Cup</h1>
+    <p class="tagline">Melt two. Drink both. Punch the card. Every flavor meets every other flavor exactly once.</p>
+  </header>
+
+  <main id="stage" aria-live="polite"></main>
+
+  <section class="punchcard">
+    <div class="punch-head">
+      <span>Punch card</span>
+      <span id="progress">0 of 21</span>
+    </div>
+    <div class="holes" id="holes"></div>
+  </section>
+
+  <section class="standings">
+    <h2 class="sec-title">Standings</h2>
+    <div id="table-slot"></div>
+  </section>
+
+  <div class="controls">
+    <button class="ghost" id="undo">Undo last punch</button>
+    <button class="ghost" id="reset">Start over</button>
+  </div>
+  <p class="note" id="storage-note"></p>
+
+</div>
+<div class="cloth"></div>
+
+<script>
+/* ---------- the beans ---------- */
+const FLAVORS = [
+  {brand:"Lingo",        roast:"Fazenda Espresso",  lid:"images/lingo.png"},
+  {brand:"Humongous",    roast:"Little Big Shot",   lid:"images/humongous.png"},
+  {brand:"First Person", roast:"Main Character",    lid:"images/first-person.png"},
+  {brand:"Humongous",    roast:"Big Red Train",     lid:"images/humongous.png"},
+  {brand:"Lingo",        roast:"La Estrella",       lid:"images/lingo.png"},
+  {brand:"Proud Mary",   roast:"Humbler",           lid:"images/proud-mary.png"},
+  {brand:"Onyx",         roast:"Southern Weather",  lid:"images/onyx.png"},
+];
+
+/* Round-robin, circle method, ordered so no flavor ever appears two days running. */
+const SCHEDULE = [
+  [1,6],[3,4],[2,5],[1,4],[0,6],[2,3],[0,5],[1,2],[6,4],[5,3],[0,4],
+  [6,2],[0,3],[4,2],[5,1],[0,2],[3,1],[5,6],[0,1],[3,6],[4,5]
+];
+
+/* ---------- storage (localStorage on a real host, memory as a fallback) ---------- */
+const KEY = "cometeer-cup-v1";
+let memory = null, persists = true;
+function load(){
+  try{
+    const raw = localStorage.getItem(KEY);
+    return raw ? JSON.parse(raw) : new Array(21).fill(null);
+  }catch(e){
+    persists = false;
+    return memory || new Array(21).fill(null);
+  }
+}
+function save(r){
+  memory = r;
+  try{ localStorage.setItem(KEY, JSON.stringify(r)); }
+  catch(e){ persists = false; }
+}
+
+let results = load();
+let justPunched = -1;
+
+const nextIndex = () => results.findIndex(r => r === null);
+
+/* ---------- rendering ---------- */
+const stage = document.getElementById("stage");
+
+function renderStage(){
+  const i = nextIndex();
+  stage.innerHTML = i === -1 ? finaleHTML() : matchupHTML(i);
+  if(i !== -1){
+    stage.querySelectorAll("[data-pick]").forEach(b => {
+      b.addEventListener("click", () => record(i, +b.dataset.pick));
+    });
+  }
+}
+
+function matchupHTML(i){
+  const [a,b] = SCHEDULE[i];
+  const A = FLAVORS[a], B = FLAVORS[b];
+  const house = A.brand === B.brand
+    ? `<p class="house-note">House match — ${A.brand} against itself</p>` : "";
+  return `
+  <div class="card">
+    <div class="card-head">
+      <span class="rule"></span>
+      <span>Matchup ${i+1} of 21 · Round ${Math.floor(i/3)+1}</span>
+      <span class="rule"></span>
+    </div>
+    ${house}
+    <div class="ring-row">
+      ${sideHTML(A,a)}
+      <div class="vs" aria-hidden="true"><span>vs</span></div>
+      ${sideHTML(B,b)}
+    </div>
+  </div>`;
+}
+
+function sideHTML(F, idx){
+  return `<div class="side">
+    <img class="lid" src="${F.lid}" alt="${F.brand} capsule lid">
+    <p class="brand">${F.brand}</p>
+    <p class="roast">${F.roast}</p>
+    <button class="pick" data-pick="${idx}">This one wins</button>
+  </div>`;
+}
+
+function record(i, winner){
+  results[i] = winner;
+  justPunched = i;
+  save(results);
+  renderAll();
+}
+
+/* ---------- standings ---------- */
+function tally(){
+  const rows = FLAVORS.map((f,i) => ({...f, id:i, wins:0, played:0}));
+  results.forEach((w,i) => {
+    if(w === null) return;
+    const [a,b] = SCHEDULE[i];
+    rows[a].played++; rows[b].played++;
+    rows[w].wins++;
+  });
+  // sort by wins, break ties on head-to-head within the tied group
+  rows.sort((x,y) => y.wins - x.wins || headToHead(y.id, x.id) || x.roast.localeCompare(y.roast));
+  return rows;
+}
+function headToHead(p,q){
+  const i = SCHEDULE.findIndex(m => m.includes(p) && m.includes(q));
+  if(i === -1 || results[i] === null) return 0;
+  return results[i] === p ? 1 : -1;
+}
+
+function renderTable(){
+  const rows = tally();
+  const best = Math.max(1, ...rows.map(r => r.wins));
+  const done = nextIndex() === -1;
+  document.getElementById("table-slot").innerHTML = `
+  <table>
+    <thead><tr>
+      <th class="rank">#</th><th>Flavor</th>
+      <th class="num">Won</th><th class="num">Poured</th>
+    </tr></thead>
+    <tbody>
+    ${rows.map((r,n) => `
+      <tr class="${done && n === 0 ? "top" : ""}">
+        <td class="rank">${n+1}</td>
+        <td><div class="name-cell">
+          <img class="chip" src="${r.lid}" alt="">
+          <div><b>${r.roast}</b><small>${r.brand}</small></div>
+        </div></td>
+        <td class="num">
+${r.wins ? `<span class="bar" style="width:${Math.round(r.wins/best*46)}px"></span>` : ""}
+          &nbsp;${r.wins}
+        </td>
+        <td class="num">${r.played}/6</td>
+      </tr>`).join("")}
+    </tbody>
+  </table>`;
+}
+
+/* ---------- finale ---------- */
+function finaleHTML(){
+  const rows = tally();
+  const places = ["1st","2nd","3rd"];
+  return `
+  <div class="card finale">
+    <span class="ribbon">Card full · results are in</span>
+    <p class="card-title">${rows[0].roast} takes the cup</p>
+    <div class="podium">
+      ${[1,0,2].map(k => `
+        <div class="pod ${k===0?"first":""}">
+          <img src="${rows[k].lid}" alt="${rows[k].brand} capsule lid">
+          <span class="place">${places[k]}</span>
+          <span class="who">${rows[k].roast}<small>${rows[k].brand} · ${rows[k].wins} wins</small></span>
+        </div>`).join("")}
+    </div>
+  </div>`;
+}
+
+/* ---------- punch card ---------- */
+function renderHoles(){
+  const cur = nextIndex();
+  const done = results.filter(r => r !== null).length;
+  document.getElementById("progress").textContent = `${done} of 21 punched`;
+  document.getElementById("holes").innerHTML = SCHEDULE.map((m,i) => {
+    const w = results[i];
+    const cls = w !== null ? "done" : (i === cur ? "now" : "");
+    const fresh = i === justPunched ? " fresh" : "";
+    const label = w !== null
+      ? `Matchup ${i+1}: ${FLAVORS[w].roast} won`
+      : `Matchup ${i+1}: ${FLAVORS[m[0]].roast} vs ${FLAVORS[m[1]].roast}`;
+    return `<div class="hole ${cls}${fresh}" title="${label}">${i+1}</div>`;
+  }).join("");
+  justPunched = -1;
+}
+
+function renderAll(){ renderStage(); renderHoles(); renderTable(); }
+
+/* ---------- controls ---------- */
+document.getElementById("undo").addEventListener("click", () => {
+  const last = results.reduce((acc,r,i) => r !== null ? i : acc, -1);
+  if(last === -1) return;
+  results[last] = null;
+  save(results);
+  renderAll();
+});
+document.getElementById("reset").addEventListener("click", () => {
+  if(!confirm("Clear all 21 results and start the card over?")) return;
+  results = new Array(21).fill(null);
+  save(results);
+  renderAll();
+});
+
+renderAll();
+if(!persists){
+  document.getElementById("storage-note").textContent =
+    "Heads up: this browser is blocking saved data, so results will vanish on refresh.";
+}
+</script>
+</body>
+</html>
