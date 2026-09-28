@@ -84,6 +84,7 @@ h1{
 .lid{
   width:100%;max-width:132px;aspect-ratio:1/1.1;
   object-fit:contain;display:block;
+  filter:drop-shadow(0 2px 3px rgba(43,27,18,.22));
   transition:transform .3s cubic-bezier(.34,1.6,.5,1);
 }
 .side:hover .lid,.side:focus-within .lid{transform:rotate(-3deg) scale(1.05)}
@@ -165,7 +166,7 @@ th.num,td.num{text-align:right;width:1%;white-space:nowrap}
 tr.top td{background:#E3902626}
 .rank{color:var(--ink-soft);width:1%;padding-right:0}
 .name-cell{display:flex;align-items:center;gap:10px;font-family:var(--body)}
-.chip{width:26px;height:29px;object-fit:contain;flex:0 0 auto}
+.chip{width:26px;height:29px;object-fit:contain;flex:0 0 auto;filter:drop-shadow(0 1px 1.5px rgba(43,27,18,.28))}
 .name-cell b{font-weight:700}
 .name-cell small{display:block;color:var(--ink-soft);font-size:.78rem;font-family:var(--data)}
 .bar{
@@ -182,7 +183,7 @@ tr.top td{background:#E3902626}
 }
 .podium{display:flex;justify-content:center;align-items:flex-end;gap:10px;flex-wrap:wrap;margin:14px 0 4px}
 .pod{display:flex;flex-direction:column;align-items:center;width:136px}
-.pod img{width:78px;height:86px;object-fit:contain}
+.pod img{width:78px;height:86px;object-fit:contain;filter:drop-shadow(0 2px 3px rgba(43,27,18,.22))}
 .pod .place{font-family:var(--display);font-size:1.6rem;color:var(--cherry);line-height:1}
 .pod .who{font-size:.88rem;margin-top:6px;line-height:1.3;font-weight:700}
 .pod .who small{display:block;color:var(--ink-soft);font-family:var(--data);font-size:.7rem;font-weight:400;margin-top:3px}
@@ -198,6 +199,25 @@ tr.top td{background:#E3902626}
   padding:9px 15px;border-radius:999px;cursor:pointer;transition:.15s;
 }
 .ghost:hover{border-color:var(--cocoa);color:var(--cocoa)}
+.keepsafe{
+  margin-top:34px;background:#6E7B3C14;
+  border:2px solid var(--hairline);border-radius:18px;padding:20px 20px 22px;
+  text-align:center;
+}
+.keepsafe-title{
+  font-family:var(--data);font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--avocado);margin:0 0 10px;
+}
+.keepsafe-copy{margin:0 auto;max-width:52ch;font-size:.92rem;color:var(--ink-soft);line-height:1.55}
+.code-line{
+  margin:14px 0 0;font-family:var(--data);font-size:.72rem;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--ink-soft);
+}
+.code-line code{
+  font-family:var(--data);text-transform:none;letter-spacing:.08em;
+  background:var(--milk);border:1.5px solid var(--hairline);border-radius:6px;
+  padding:3px 8px;color:var(--cocoa);word-break:break-all;
+}
 .note{
   text-align:center;font-family:var(--data);font-size:.7rem;color:var(--ink-soft);
   margin-top:16px;line-height:1.6;
@@ -226,9 +246,9 @@ tr.top td{background:#E3902626}
 <div class="wrap">
 
   <header>
-    <p class="eyebrow">Seven beans · twenty-one rounds · one winner</p>
+    <p class="eyebrow">Round two · Cullen&rsquo;s palate</p>
     <h1>The Cometeer Cup</h1>
-    <p class="tagline">Melt two. Drink both. Punch the card. Every flavor meets every other flavor exactly once.</p>
+    <p class="tagline">Melt two. Drink both. Punch the card. Seven new beans, twenty-one matchups, every flavor against every other exactly once.</p>
   </header>
 
   <main id="stage" aria-live="polite"></main>
@@ -250,7 +270,25 @@ tr.top td{background:#E3902626}
     <button class="ghost" id="undo">Undo last punch</button>
     <button class="ghost" id="reset">Start over</button>
   </div>
-  <p class="note" id="storage-note"></p>
+
+  <section class="keepsafe">
+    <p class="keepsafe-title">Keeping your results safe</p>
+    <p class="keepsafe-copy">
+      Every punch is written into this page&rsquo;s web address, so the link in your
+      address bar <em>is</em> your save file. Bookmark it, or send it to yourself.
+      Opening it anywhere &mdash; phone, laptop, a browser you&rsquo;ve just wiped &mdash;
+      restores the card.
+    </p>
+    <p class="code-line">Backup code: <code id="code">&mdash;</code></p>
+    <div class="controls" style="margin-top:14px">
+      <button class="ghost" id="copy">Copy backup link</button>
+      <button class="ghost" id="download">Save backup file</button>
+      <button class="ghost" id="restore">Restore from file</button>
+    </div>
+    <input type="file" id="file" accept="application/json,.json" hidden>
+  </section>
+
+  <p class="note" id="storage-note" role="status"></p>
 
 </div>
 <div class="cloth"></div>
@@ -258,40 +296,77 @@ tr.top td{background:#E3902626}
 <script>
 /* ---------- the beans ---------- */
 const FLAVORS = [
-  {brand:"Lingo",        roast:"Fazenda Espresso",  lid:"images/lingo.png"},
-  {brand:"Humongous",    roast:"Little Big Shot",   lid:"images/humongous.png"},
-  {brand:"First Person", roast:"Main Character",    lid:"images/first-person.png"},
-  {brand:"Humongous",    roast:"Big Red Train",     lid:"images/humongous.png"},
-  {brand:"Lingo",        roast:"La Estrella",       lid:"images/lingo.png"},
-  {brand:"Proud Mary",   roast:"Humbler",           lid:"images/proud-mary.png"},
-  {brand:"Onyx",         roast:"Southern Weather",  lid:"images/onyx.png"},
+  {brand:"Lingo",         roast:"La Estrella",      lid:"images/lingo.png"},
+  {brand:"Onyx",          roast:"Southern Weather", lid:"images/onyx.png"},
+  {brand:"Humongous",     roast:"Big Red Train",    lid:"images/humongous.png"},
+  {brand:"Proud Mary",    roast:"Humbler",          lid:"images/proud-mary.png"},
+  {brand:"First Person",  roast:"Main Character",   lid:"images/first-person.png"},
+  {brand:"Black & White", roast:"First in Flight",  lid:"images/black-white.png"},
+  {brand:"Lingo",         roast:"Fazenda Espresso", lid:"images/lingo.png"},
 ];
 
-/* Round-robin, circle method, ordered so no flavor ever appears two days running. */
+/* Round-robin, circle method, relabeled so days 1 and 2 are the matchups Em
+   called, then ordered so no flavor ever appears two days running. */
 const SCHEDULE = [
-  [0,1],[3,6],[4,5],[1,6],[2,5],[3,4],[6,2],[0,4],[5,3],[0,6],[2,3],
-  [1,4],[5,6],[0,2],[3,1],[0,5],[1,2],[6,4],[5,1],[4,2],[0,3]
+  [6,3],[0,4],[2,5],[3,4],[2,6],[1,5],[0,3],[2,4],[1,6],[2,3],[0,5],
+  [1,4],[0,2],[1,3],[5,6],[1,2],[0,6],[4,5],[0,1],[3,5],[4,6]
 ];
 
 /* ---------- storage (localStorage on a real host, memory as a fallback) ---------- */
-const KEY = "cometeer-cup-v2";
+const CUP = 3;                       // bump whenever the lineup changes
+const KEY = "cometeer-cup-v" + CUP;
+const EMPTY = () => new Array(21).fill(null);
 let memory = null, persists = true;
-function load(){
+
+/* Results encode to a 21-character code: one digit per matchup (the winning
+   flavor's index), or "-" for a matchup not yet poured. Short enough to live in
+   the URL, plain enough to read with your own eyes. */
+function encode(r){ return r.map(w => w === null ? "-" : String(w)).join(""); }
+function decode(code){
+  if(typeof code !== "string") return null;
+  const c = code.trim();
+  if(!/^[0-6-]{1,21}$/.test(c)) return null;
+  const out = EMPTY();
+  for(let i = 0; i < c.length; i++) if(c[i] !== "-") out[i] = +c[i];
+  return out;
+}
+const punchCount = r => r.filter(x => x !== null).length;
+
+function fromLocal(){
   try{
     const raw = localStorage.getItem(KEY);
-    return raw ? JSON.parse(raw) : new Array(21).fill(null);
-  }catch(e){
-    persists = false;
-    return memory || new Array(21).fill(null);
-  }
+    return raw ? JSON.parse(raw) : null;
+  }catch(e){ persists = false; return memory; }
 }
+let staleLink = false;
+function fromURL(){
+  const tagged = location.hash.match(/r=c(\d+)-([0-6-]+)/);
+  if(tagged){
+    if(+tagged[1] !== CUP){ staleLink = true; return null; }
+    return decode(tagged[2]);
+  }
+  // an untagged code is from an earlier lineup — its digits mean other flavors now
+  if(/r=[0-6-]+/.test(location.hash)) staleLink = true;
+  return null;
+}
+
+/* On load, keep whichever copy is further along — so opening an old bookmark can
+   never roll you backwards, and a wiped browser recovers from the link. */
+function load(){
+  const a = fromLocal(), b = fromURL();
+  if(a && b) return punchCount(b) > punchCount(a) ? b : a;
+  return a || b || EMPTY();
+}
+
 function save(r){
   memory = r;
   try{ localStorage.setItem(KEY, JSON.stringify(r)); }
   catch(e){ persists = false; }
+  try{ history.replaceState(null, "", "#r=c" + CUP + "-" + encode(r)); }catch(e){}
 }
 
 let results = load();
+save(results);
 let justPunched = -1;
 
 const nextIndex = () => results.findIndex(r => r === null);
@@ -429,7 +504,10 @@ function renderHoles(){
   justPunched = -1;
 }
 
-function renderAll(){ renderStage(); renderHoles(); renderTable(); }
+function renderAll(){
+  renderStage(); renderHoles(); renderTable();
+  document.getElementById("code").textContent = encode(results);
+}
 
 /* ---------- controls ---------- */
 document.getElementById("undo").addEventListener("click", () => {
@@ -440,17 +518,94 @@ document.getElementById("undo").addEventListener("click", () => {
   renderAll();
 });
 document.getElementById("reset").addEventListener("click", () => {
-  if(!confirm("Clear all 21 results and start the card over?")) return;
-  results = new Array(21).fill(null);
+  if(punchCount(results) === 0) return;
+  if(!confirm(
+    "Clear all 21 results and start over?\n\n" +
+    "Your current backup code is:\n" + encode(results) +
+    "\n\nIf you might want these back, cancel and save a backup file first."
+  )) return;
+  results = EMPTY();
   save(results);
   renderAll();
+  say("Card cleared.");
+});
+
+/* ---------- backup ---------- */
+function say(msg){
+  const n = document.getElementById("storage-note");
+  n.textContent = msg;
+  clearTimeout(say.t);
+  say.t = setTimeout(() => { n.textContent = baseNote(); }, 4000);
+}
+function baseNote(){
+  if(staleLink) return "That link is a save from the earlier lineup, so it was ignored — this round starts fresh.";
+  return persists ? "" :
+    "Heads up: this browser is blocking saved data. The backup link above still works — bookmark it.";
+}
+
+document.getElementById("copy").addEventListener("click", async () => {
+  const url = location.href;
+  try{
+    await navigator.clipboard.writeText(url);
+    say("Backup link copied to your clipboard.");
+  }catch(e){
+    prompt("Copy this link:", url);
+  }
+});
+
+document.getElementById("download").addEventListener("click", () => {
+  const log = SCHEDULE.map((m,i) => ({
+    matchup: i + 1,
+    a: `${FLAVORS[m[0]].brand} — ${FLAVORS[m[0]].roast}`,
+    b: `${FLAVORS[m[1]].brand} — ${FLAVORS[m[1]].roast}`,
+    winner: results[i] === null ? null : `${FLAVORS[results[i]].brand} — ${FLAVORS[results[i]].roast}`
+  }));
+  const payload = {
+    app: "cometeer-cup", version: CUP,
+    saved: new Date().toISOString(),
+    code: encode(results),
+    punched: punchCount(results),
+    standings: tally().map(r => ({flavor: r.roast, brand: r.brand, wins: r.wins, poured: r.played})),
+    log
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], {type: "application/json"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `cometeer-cup-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+  say("Backup file saved to your downloads.");
+});
+
+document.getElementById("restore").addEventListener("click", () => document.getElementById("file").click());
+document.getElementById("file").addEventListener("change", e => {
+  const f = e.target.files[0];
+  if(!f) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    let parsed = null, wrongCup = false;
+    try{
+      const j = JSON.parse(reader.result);
+      if(j.app === "cometeer-cup" && j.version !== CUP) wrongCup = true;
+      else parsed = decode(j.code);
+    }catch(err){}
+    if(wrongCup){ say("That backup is from an earlier lineup, so its results don't map onto this one."); return; }
+    if(!parsed){ say("That file didn't look like a Cometeer Cup backup."); return; }
+    if(punchCount(parsed) < punchCount(results) &&
+       !confirm(`That backup has ${punchCount(parsed)} punches; this card has ${punchCount(results)}. Restore anyway?`)){
+      return;
+    }
+    results = parsed;
+    save(results);
+    renderAll();
+    say(`Restored — ${punchCount(results)} of 21 punched.`);
+  };
+  reader.readAsText(f);
+  e.target.value = "";
 });
 
 renderAll();
-if(!persists){
-  document.getElementById("storage-note").textContent =
-    "Heads up: this browser is blocking saved data, so results will vanish on refresh.";
-}
+document.getElementById("storage-note").textContent = baseNote();
 </script>
 </body>
 </html>
